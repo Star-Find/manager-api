@@ -1,0 +1,16 @@
+package net.starfind.api.model;
+
+public enum ClanRank {
+	RECRUIT,
+	CORPORAL,
+	SERGEANT,
+	LIEUTENANT,
+	CAPTAIN,
+	GENERAL,
+	ADMIN,
+	ORGANISER,
+	COORDINATOR,
+	OVERSEER,
+	DEPUTY_OWNER,
+	OWNER
+}
