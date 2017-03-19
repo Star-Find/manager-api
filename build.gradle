@@ -28,7 +28,5 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.security.oauth:spring-security-oauth2:2.1.0.RELEASE'
 	
-	runtime 'org.slf4j:slf4j-simple:1.7.21';
-	
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }

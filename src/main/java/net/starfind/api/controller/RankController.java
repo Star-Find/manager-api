@@ -18,18 +18,18 @@ import net.starfind.api.model.Role;
 import net.starfind.api.repository.RankRepository;
 
 @RestController
-@RequestMapping(path="/ranks", produces="application/json", consumes="application/json")
+@RequestMapping(path="/ranks/", produces="application/json", consumes="application/json")
 public class RankController {
 	
 	@Autowired
 	private RankRepository rankRepository;
 
-	@RequestMapping(method=RequestMethod.GET)
+	@RequestMapping(method=RequestMethod.GET, consumes="*/*")
 	public List<RankedPlayer> getRanks () {
 		return rankRepository.findAll();
 	}
 	
-	@RequestMapping(path="{id}", method=RequestMethod.GET)
+	@RequestMapping(path="{id}", method=RequestMethod.GET, consumes="*/*")
 	public RankedPlayer getRank(@PathVariable("id") UUID id) {
 		return rankRepository.findOne(id.toString());
 	}
