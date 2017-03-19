@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,11 +34,13 @@ public class RankController {
 		return rankRepository.findOne(id.toString());
 	}
 
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(method=RequestMethod.POST, consumes="application/json")
 	public RankedPlayer addRank(RankedPlayer member) {
-		return member;
+		return rankRepository.save(member);
 	}
-	
+
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(path="{id}/name", method={RequestMethod.POST, RequestMethod.PUT}, consumes="application/json")
 	public RankedPlayer updateName (
 			@PathVariable("id") UUID id, 
@@ -47,7 +50,8 @@ public class RankController {
 		player.setName(name, dateChanged);
 		return rankRepository.save(player);
 	}
-	
+
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(path="{id}/role", method={RequestMethod.POST, RequestMethod.PUT}, consumes="application/json")
 	public RankedPlayer updateRole (
 			@PathVariable("id") UUID id, 

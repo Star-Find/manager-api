@@ -33,6 +33,11 @@ public class RankedPlayer extends Player {
 	public RankedPlayer () {
 		addedDate = LocalDate.now(Clock.systemUTC());
 	}
+	
+	public RankedPlayer (String id, LocalDate added) {
+		this.id = id;
+		this.addedDate = added;
+	}
 
 	public LocalDate getAddedDate() {
 		return addedDate;

@@ -33,13 +33,13 @@ public abstract class Player {
 	@Id
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	private String id;
+	protected String id;
 	
 	@Column(nullable=false, length=12)
-	private String name;
+	protected String name;
 	
 	@ElementCollection(targetClass=NameChange.class)
-	private List<NameChange> nameHistory;
+	protected List<NameChange> nameHistory;
 	
 	public String getId() {
 		return id;
