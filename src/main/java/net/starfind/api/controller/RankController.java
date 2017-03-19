@@ -28,6 +28,11 @@ public class RankController {
 		return rankRepository.findAll();
 	}
 	
+	@RequestMapping(path="{id}", method=RequestMethod.GET)
+	public RankedPlayer getRank(@PathVariable("id") UUID id) {
+		return rankRepository.findOne(id.toString());
+	}
+
 	@RequestMapping(method=RequestMethod.POST, consumes="application/json")
 	public RankedPlayer addRank(RankedPlayer member) {
 		return member;
