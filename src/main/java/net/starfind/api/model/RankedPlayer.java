@@ -3,6 +3,7 @@ package net.starfind.api.model;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
@@ -46,15 +47,15 @@ public class RankedPlayer extends Player {
 	}
 
 	public void setRole (Role role) {
-		setRole(role, null);
+		setRole(role, Optional.empty(), Optional.empty());
 	}
 
-	public void setRole (Role role, String notes) {
+	public void setRole (Role role, Optional<String> notes, Optional<LocalDate> dateChanged) {
 		if (role != null && !role.equals(this.role)) {
 			RoleChange change = new RoleChange();
 			change.role = role;
-			change.notes = notes;
-			change.date = LocalDate.now(Clock.systemUTC());
+			change.notes = notes.orElse(null);
+			change.date = dateChanged.orElse(LocalDate.now(Clock.systemUTC()));
 			roleHistory.add(change);
 			
 			this.role = role;

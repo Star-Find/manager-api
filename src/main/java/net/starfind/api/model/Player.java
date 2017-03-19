@@ -5,6 +5,7 @@ import static javax.persistence.InheritanceType.TABLE_PER_CLASS;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -49,14 +50,14 @@ public abstract class Player {
 	}
 	
 	public void setName (String name) {
-		setName(name, LocalDate.now(Clock.systemUTC()));
+		setName(name, Optional.empty());
 	}
 	
-	public void setName (String name, LocalDate changeDate) {
+	public void setName (String name, Optional<LocalDate> changeDate) {
 		if (name != null && !name.equalsIgnoreCase(this.name)) {
 			NameChange change = new NameChange();
 			change.name = name;
-			change.changeDate = changeDate;
+			change.changeDate = changeDate.orElse(LocalDate.now(Clock.systemUTC()));
 			nameHistory.add(change);
 			
 			this.name = name;
