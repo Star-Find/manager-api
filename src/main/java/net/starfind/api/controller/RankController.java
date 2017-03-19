@@ -7,29 +7,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.starfind.api.model.Member;
+import net.starfind.api.model.RankedPlayer;
 
 @RestController
 @RequestMapping(path="/ranks", produces="application/json", consumes="application/json")
 public class RankController {
 
 	@RequestMapping(method=RequestMethod.GET)
-	public List<Member> getRanks () {
+	public List<RankedPlayer> getRanks () {
 		return null;
 	}
 	
 	@RequestMapping(method=RequestMethod.POST, consumes="application/json")
-	public Member addRank(Member member) {
+	public RankedPlayer addRank(RankedPlayer member) {
 		return member;
 	}
 	
 	@RequestMapping(method=RequestMethod.PATCH)
-	public Member updateMember() {
+	public RankedPlayer updateMember() {
 		return null;
 	}
 	
 	@RequestMapping(path="{id}/name", method={RequestMethod.POST, RequestMethod.PUT}, consumes="application/json")
-	public Member updateName (UUID id, String name) {
+	public RankedPlayer updateName (UUID id, String name) {
 		return null;
 	}
 }

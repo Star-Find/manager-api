@@ -1,6 +1,6 @@
 package net.starfind.api.model;
 
-public enum RankTitle {
+public enum Role {
 	FOUNDER(FriendChatRank.GENERAL, ClanRank.DEPUTY_OWNER),
 	CUSTODIAN(FriendChatRank.GENERAL, ClanRank.DEPUTY_OWNER),
 	ADMINISTRATOR(FriendChatRank.GENERAL, ClanRank.OVERSEER),
@@ -13,7 +13,7 @@ public enum RankTitle {
 	INACTIVE_RIT(FriendChatRank.RECRUIT, ClanRank.RECRUIT),
 	CONTRIBUTOR(FriendChatRank.FRIEND, null);
 	
-	RankTitle(FriendChatRank fcRank, ClanRank clanRank) {
+	Role(FriendChatRank fcRank, ClanRank clanRank) {
 		
 	}
 }
