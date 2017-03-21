@@ -65,4 +65,20 @@ public class TestRankApi {
 			.andExpect(jsonPath("$.name", is(name)))
 			.andExpect(jsonPath("$.addedDate", is(added.toString())));
 	}
+
+	@Test
+	public void testGetRanks () throws Exception {
+		RankedPlayer player1 = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 19)));
+		RankedPlayer player2 = rankRepository.save(new RankedPlayer("Test 2", LocalDate.of(2017, 2, 21)));
+		
+		mockMvc.perform(get("/ranks/?sort=name"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+			.andExpect(jsonPath("$.content[0].id", is(player1.getId().toString())))
+			.andExpect(jsonPath("$.content[0].name", is(player1.getName())))
+			.andExpect(jsonPath("$.content[0].addedDate", is(player1.getAddedDate().toString())))
+			.andExpect(jsonPath("$.content[1].id", is(player2.getId().toString())))
+			.andExpect(jsonPath("$.content[1].name", is(player2.getName())))
+			.andExpect(jsonPath("$.content[1].addedDate", is(player2.getAddedDate().toString())));
+	}
 }

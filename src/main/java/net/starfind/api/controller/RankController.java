@@ -6,6 +6,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,8 +29,8 @@ public class RankController {
 
 	//@Secured("ROLE_ANNONYMOUS")
 	@RequestMapping(method=RequestMethod.GET, consumes="*/*")
-	public List<RankedPlayer> getRanks () {
-		return rankRepository.findAll();
+	public Page<RankedPlayer> getRanks (Pageable pageable) {
+		return rankRepository.findAll(pageable);
 	}
 	
 	@RequestMapping(path="{id}", method=RequestMethod.GET, consumes="*/*")
