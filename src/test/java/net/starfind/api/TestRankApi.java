@@ -1,7 +1,6 @@
 package net.starfind.api;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -12,50 +11,58 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import net.starfind.api.controller.RankController;
 import net.starfind.api.model.RankedPlayer;
 import net.starfind.api.repository.RankRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestRankApi.class})
-@WebAppConfiguration
+@SpringBootTest(classes=ManagerApplication.class)
+@ContextConfiguration(classes=ManagerApplication.class)
+@AutoConfigureMockMvc
 public class TestRankApi {
 	
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
         MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
- 
+
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
     
-    @Mock
-    private RankRepository repo;
-	
+    @Autowired
+    private RankRepository rankRepository;
+
 	@InjectMocks
 	private RankController controller;
 
 	@Before
 	public void setup() {
-		mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
 
 	@Test
 	public void testGetRank () throws Exception {
-		String id = "fc945d35-75a1-40e3-b9e8-11c803c25807";
 		LocalDate added = LocalDate.of(2017, 3, 19); 
-		RankedPlayer player = new RankedPlayer(id, added);
+		String name = "Test";
+		RankedPlayer player = new RankedPlayer(name, added);
 		
-		when(repo.findOne(id)).thenReturn(player);
+		player = rankRepository.save(player);
 		
-		mockMvc.perform(get("/ranks/"+id+"/"))
+		mockMvc.perform(get("/ranks/"+player.getId()+"/"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
-			.andExpect(jsonPath("$.id", is(id)));
+			.andExpect(jsonPath("$.id", is(player.getId().toString())))
+			.andExpect(jsonPath("$.name", is(name)))
+			.andExpect(jsonPath("$.addedDate", is(added.toString())));
 	}
 }

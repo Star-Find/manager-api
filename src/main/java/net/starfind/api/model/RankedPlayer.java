@@ -5,11 +5,15 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RankedPlayer extends Player {
 	
 	@Embeddable
@@ -22,6 +26,7 @@ public class RankedPlayer extends Player {
 		String notes;
 	}
 	
+	@Column(nullable=false)
 	private LocalDate addedDate;
 	
 	private Role role;
@@ -34,8 +39,8 @@ public class RankedPlayer extends Player {
 		addedDate = LocalDate.now(Clock.systemUTC());
 	}
 	
-	public RankedPlayer (String id, LocalDate added) {
-		this.id = id;
+	public RankedPlayer (String name, LocalDate added) {
+		this.name = name;
 		this.addedDate = added;
 	}
 

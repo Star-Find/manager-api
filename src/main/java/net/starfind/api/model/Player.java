@@ -6,6 +6,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -14,8 +15,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
-
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Inheritance(strategy=TABLE_PER_CLASS)
@@ -31,9 +30,8 @@ public abstract class Player {
 	}
 	
 	@Id
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	protected String id;
+	@GeneratedValue
+	protected UUID id;
 	
 	@Column(nullable=false, length=12)
 	protected String name;
@@ -41,7 +39,7 @@ public abstract class Player {
 	@ElementCollection(targetClass=NameChange.class)
 	protected List<NameChange> nameHistory;
 	
-	public String getId() {
+	public UUID getId() {
 		return id;
 	}
 	

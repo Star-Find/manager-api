@@ -1,0 +1,1 @@
+INSERT INTO ranked_player (id, name, added_date) VALUES ('fc945d35-75a1-40e3-b9e8-11c803c25807', 'Test', '2017-03-20')
