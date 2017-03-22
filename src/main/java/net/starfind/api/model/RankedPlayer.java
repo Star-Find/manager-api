@@ -34,7 +34,6 @@ public class RankedPlayer extends Player {
 	@ElementCollection(targetClass=RoleChange.class)
 	private List<RoleChange> roleHistory;
 	
-	
 	public RankedPlayer () {
 		addedDate = LocalDate.now(Clock.systemUTC());
 	}

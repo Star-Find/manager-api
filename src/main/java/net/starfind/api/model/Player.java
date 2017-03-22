@@ -10,24 +10,16 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 @Inheritance(strategy=TABLE_PER_CLASS)
 public abstract class Player {
-	
-	@Embeddable
-	static final class NameChange {
-		@Column(nullable=false, length=12)
-		String name;
-		
-		@Column(nullable=false)
-		LocalDate changeDate;
-	}
 	
 	@Id
 	@GeneratedValue
@@ -46,6 +38,10 @@ public abstract class Player {
 	public String getName () {
 		return name;
 	}
+
+	public List<NameChange> getNameHistory() {
+		return nameHistory;
+	}
 	
 	public void setName (String name) {
 		setName(name, Optional.empty());
@@ -53,11 +49,7 @@ public abstract class Player {
 	
 	public void setName (String name, Optional<LocalDate> changeDate) {
 		if (name != null && !name.equalsIgnoreCase(this.name)) {
-			NameChange change = new NameChange();
-			change.name = name;
-			change.changeDate = changeDate.orElse(LocalDate.now(Clock.systemUTC()));
-			nameHistory.add(change);
-			
+			nameHistory.add(new NameChange(name, changeDate.orElse(LocalDate.now(Clock.systemUTC()))));
 			this.name = name;
 		}
 	}
