@@ -1,7 +1,5 @@
 package net.starfind.api.controller;
 
-import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.starfind.api.model.NameChange;
 import net.starfind.api.model.RankedPlayer;
-import net.starfind.api.model.Role;
+import net.starfind.api.model.RoleChange;
 import net.starfind.api.repository.RankRepository;
 
 @RestController
@@ -49,7 +46,11 @@ public class RankController {
 			@PathVariable("id") UUID id, 
 			@RequestBody(required=true) NameChange nameChange) {
 		RankedPlayer player = rankRepository.findOne(id);
-		player.setName(nameChange.getName(), Optional.ofNullable(nameChange.getChangeDate()));
+		if (nameChange.getChangeDate() == null) {
+			player.setName(nameChange.getName());			
+		} else {
+			player.setName(nameChange.getName(), nameChange.getChangeDate());			
+		}
 		return rankRepository.save(player);
 	}
 
@@ -57,12 +58,13 @@ public class RankController {
 	@RequestMapping(path="{id}/role", method={RequestMethod.POST, RequestMethod.PUT})
 	public RankedPlayer updateRole (
 			@PathVariable("id") UUID id, 
-			@RequestBody
-			@RequestParam(name="role", required=true) Role role,
-			@RequestParam("note") Optional<String> note,
-			@RequestParam("date") Optional<LocalDate> dateChanged) {
+			@RequestBody(required=true) RoleChange roleChange) {
 		RankedPlayer player = rankRepository.findOne(id);
-		player.setRole(role, note, dateChanged);
+		if (roleChange.getChangeDate() == null) {
+			player.setRole(roleChange.getRole(), roleChange.getNotes());
+		} else {
+			player.setRole(roleChange.getRole(), roleChange.getNotes(), roleChange.getChangeDate());
+		}
 		return rankRepository.save(player);
 	}
 }

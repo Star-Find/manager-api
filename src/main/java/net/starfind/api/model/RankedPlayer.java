@@ -3,11 +3,9 @@ package net.starfind.api.model;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,16 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RankedPlayer extends Player {
-	
-	@Embeddable
-	static final class RoleChange {
-		
-		Role role;
-		
-		LocalDate date;
-		
-		String notes;
-	}
 	
 	@Column(nullable=false)
 	private LocalDate addedDate;
@@ -56,17 +44,16 @@ public class RankedPlayer extends Player {
 	}
 
 	public void setRole (Role role) {
-		setRole(role, Optional.empty(), Optional.empty());
+		setRole(role, null);
 	}
 
-	public void setRole (Role role, Optional<String> notes, Optional<LocalDate> dateChanged) {
+	public void setRole (Role role, String notes) {
+		setRole(role, notes, LocalDate.now(Clock.systemUTC()));
+	}
+
+	public void setRole (Role role, String notes, LocalDate changeDate) {
 		if (role != null && !role.equals(this.role)) {
-			RoleChange change = new RoleChange();
-			change.role = role;
-			change.notes = notes.orElse(null);
-			change.date = dateChanged.orElse(LocalDate.now(Clock.systemUTC()));
-			roleHistory.add(change);
-			
+			roleHistory.add(new RoleChange(role, changeDate, notes));
 			this.role = role;
 		}
 	}

@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.Charset;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.starfind.api.controller.RankController;
 import net.starfind.api.model.RankedPlayer;
+import net.starfind.api.model.Role;
 import net.starfind.api.repository.RankRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -118,5 +120,81 @@ public class TestRankApi {
 			.andExpect(jsonPath("$.name", is(newName)))
 			.andExpect(jsonPath("$.nameHistory[0].name", is(newName)))
 			.andExpect(jsonPath("$.nameHistory[0].changeDate", is(changeDate.toString())));
+	}
+	
+	@Test
+	public void testSetRankNameNoDate () throws Exception {
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 14)));
+		
+		String newName = "New Name";
+		LocalDate changeDate = LocalDate.now(Clock.systemUTC());
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("name", newName);
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(put("/ranks/{id}/name", player.getId().toString())
+					.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+        	.andDo(MockMvcResultHandlers.print())
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+			.andExpect(jsonPath("$.id", is(player.getId().toString())))
+			.andExpect(jsonPath("$.name", is(newName)))
+			.andExpect(jsonPath("$.nameHistory[0].name", is(newName)))
+			.andExpect(jsonPath("$.nameHistory[0].changeDate", is(changeDate.toString())));
+	}
+	
+	@Test
+	public void testSetRankRole () throws Exception {
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 14)));
+		
+		Role newRole = Role.CORPORAL;
+		String notes = "Test 123";
+		LocalDate changeDate = LocalDate.of(2017, 3, 12);
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("role", newRole.name());
+		request.put("changeDate", changeDate.toString());
+		request.put("notes", notes);
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(put("/ranks/{id}/role", player.getId().toString())
+					.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+        	.andDo(MockMvcResultHandlers.print())
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+			.andExpect(jsonPath("$.id", is(player.getId().toString())))
+			.andExpect(jsonPath("$.role", is(newRole.toString())))
+			.andExpect(jsonPath("$.roleHistory[0].role", is(newRole.toString())))
+			.andExpect(jsonPath("$.roleHistory[0].notes", is(notes)))
+			.andExpect(jsonPath("$.roleHistory[0].changeDate", is(changeDate.toString())));
+	}
+	
+	@Test
+	public void testSetRankRoleNoDate () throws Exception {
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 14)));
+		
+		Role newRole = Role.CORPORAL;
+		String notes = "Test 123";
+		LocalDate changeDate = LocalDate.now(Clock.systemUTC());
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("role", newRole.name());
+		request.put("notes", notes);
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(put("/ranks/{id}/role", player.getId().toString())
+					.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+        	.andDo(MockMvcResultHandlers.print())
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+			.andExpect(jsonPath("$.id", is(player.getId().toString())))
+			.andExpect(jsonPath("$.role", is(newRole.toString())))
+			.andExpect(jsonPath("$.roleHistory[0].role", is(newRole.toString())))
+			.andExpect(jsonPath("$.roleHistory[0].notes", is(notes)))
+			.andExpect(jsonPath("$.roleHistory[0].changeDate", is(changeDate.toString())));
 	}
 }
