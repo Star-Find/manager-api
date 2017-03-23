@@ -2,6 +2,8 @@ package net.starfind.api.controller;
 
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +38,7 @@ public class RankController {
 
 	//@PreAuthorize("hasRole('admin')")
 	@RequestMapping(method=RequestMethod.POST)
-	public RankedPlayer addRank(RankedPlayer member) {
+	public RankedPlayer addRank(@Valid @RequestBody(required=true) RankedPlayer member) {
 		return rankRepository.save(member);
 	}
 
@@ -44,12 +46,12 @@ public class RankController {
 	@RequestMapping(path="{id}/name", method={RequestMethod.POST, RequestMethod.PUT})
 	public RankedPlayer updateName (
 			@PathVariable("id") UUID id, 
-			@RequestBody(required=true) NameChange nameChange) {
+			@Valid @RequestBody(required=true) NameChange nameChange) {
 		RankedPlayer player = rankRepository.findOne(id);
 		if (nameChange.getChangeDate() == null) {
-			player.setName(nameChange.getName());			
+			player.updateName(nameChange.getName());			
 		} else {
-			player.setName(nameChange.getName(), nameChange.getChangeDate());			
+			player.updateName(nameChange.getName(), nameChange.getChangeDate());			
 		}
 		return rankRepository.save(player);
 	}
@@ -58,12 +60,12 @@ public class RankController {
 	@RequestMapping(path="{id}/role", method={RequestMethod.POST, RequestMethod.PUT})
 	public RankedPlayer updateRole (
 			@PathVariable("id") UUID id, 
-			@RequestBody(required=true) RoleChange roleChange) {
+			@Valid @RequestBody(required=true) RoleChange roleChange) {
 		RankedPlayer player = rankRepository.findOne(id);
 		if (roleChange.getChangeDate() == null) {
-			player.setRole(roleChange.getRole(), roleChange.getNotes());
+			player.updateRole(roleChange.getRole(), roleChange.getNotes());
 		} else {
-			player.setRole(roleChange.getRole(), roleChange.getNotes(), roleChange.getChangeDate());
+			player.updateRole(roleChange.getRole(), roleChange.getNotes(), roleChange.getChangeDate());
 		}
 		return rankRepository.save(player);
 	}

@@ -5,11 +5,13 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public final class RoleChange {
 
 	@Column(nullable=false)
+	@NotNull
 	private Role role;
 
 	@Column(nullable=false)

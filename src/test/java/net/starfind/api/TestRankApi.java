@@ -55,6 +55,8 @@ public class TestRankApi {
 
 	@InjectMocks
 	private RankController controller;
+	
+	private LocalDate todayUtc = LocalDate.now(Clock.systemUTC());
 
 	@Before
 	public void setup() {
@@ -70,37 +72,64 @@ public class TestRankApi {
 	public void testGetRank () throws Exception {
 		LocalDate added = LocalDate.of(2017, 3, 19); 
 		String name = "Test";
-		RankedPlayer player = new RankedPlayer(name, added);
-		
-		player = rankRepository.save(player);
+		Role role = Role.ADMINISTRATOR;
+		RankedPlayer player = rankRepository.save(new RankedPlayer(name, role, added));
 		
 		mockMvc.perform(get("/ranks/"+player.getId()+"/"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
 			.andExpect(jsonPath("$.name", is(name)))
+			.andExpect(jsonPath("$.role", is(role.toString())))
 			.andExpect(jsonPath("$.addedDate", is(added.toString())));
 	}
 
 	@Test
 	public void testGetSortedRanks () throws Exception {
-		RankedPlayer player1 = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 19)));
-		RankedPlayer player2 = rankRepository.save(new RankedPlayer("Test 2", LocalDate.of(2017, 2, 21)));
+		RankedPlayer player1 = rankRepository.save(new RankedPlayer("Test 1", Role.CORPORAL, LocalDate.of(2017, 3, 19)));
+		RankedPlayer player2 = rankRepository.save(new RankedPlayer("Test 2", Role.ELDER, LocalDate.of(2017, 2, 21)));
 		
 		mockMvc.perform(get("/ranks/?sort=name"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.content[0].id", is(player1.getId().toString())))
 			.andExpect(jsonPath("$.content[0].name", is(player1.getName())))
+			.andExpect(jsonPath("$.content[0].role", is(player1.getRole().toString())))
 			.andExpect(jsonPath("$.content[0].addedDate", is(player1.getAddedDate().toString())))
 			.andExpect(jsonPath("$.content[1].id", is(player2.getId().toString())))
 			.andExpect(jsonPath("$.content[1].name", is(player2.getName())))
+			.andExpect(jsonPath("$.content[1].role", is(player2.getRole().toString())))
 			.andExpect(jsonPath("$.content[1].addedDate", is(player2.getAddedDate().toString())));
+	}
+
+	@Test
+	public void testAddRank () throws Exception {
+		LocalDate added = LocalDate.of(2017, 3, 19); 
+		String name = "Test";
+		Role role = Role.ADMINISTRATOR;
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("name", name);
+		request.put("role", role.toString());
+		request.put("addedDate", added.toString());
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		System.out.println(requestJson);
+		
+		mockMvc.perform(post("/ranks/")
+				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+    		.andDo(MockMvcResultHandlers.print())
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+			.andExpect(jsonPath("$.name", is(name)))
+			.andExpect(jsonPath("$.role", is(role.toString())))
+			.andExpect(jsonPath("$.addedDate", is(added.toString())));
 	}
 	
 	@Test
 	public void testSetRankName () throws Exception {
-		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 14)));
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.LIEUTENANT, LocalDate.of(2017, 3, 14)));
 		
 		String newName = "New Name";
 		LocalDate changeDate = LocalDate.of(2017, 3, 19);
@@ -113,7 +142,6 @@ public class TestRankApi {
 		
 		mockMvc.perform(put("/ranks/{id}/name", player.getId().toString())
 					.contentType(APPLICATION_JSON_UTF8).content(requestJson))
-        	.andDo(MockMvcResultHandlers.print())
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
@@ -124,10 +152,9 @@ public class TestRankApi {
 	
 	@Test
 	public void testSetRankNameNoDate () throws Exception {
-		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 14)));
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
 		
 		String newName = "New Name";
-		LocalDate changeDate = LocalDate.now(Clock.systemUTC());
 		
 		Map<String, String> request = new HashMap<>();
 		request.put("name", newName);
@@ -136,18 +163,17 @@ public class TestRankApi {
 		
 		mockMvc.perform(put("/ranks/{id}/name", player.getId().toString())
 					.contentType(APPLICATION_JSON_UTF8).content(requestJson))
-        	.andDo(MockMvcResultHandlers.print())
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
 			.andExpect(jsonPath("$.name", is(newName)))
 			.andExpect(jsonPath("$.nameHistory[0].name", is(newName)))
-			.andExpect(jsonPath("$.nameHistory[0].changeDate", is(changeDate.toString())));
+			.andExpect(jsonPath("$.nameHistory[0].changeDate", is(todayUtc.toString())));
 	}
 	
 	@Test
 	public void testSetRankRole () throws Exception {
-		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 14)));
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CUSTODIAN, LocalDate.of(2017, 3, 14)));
 		
 		Role newRole = Role.CORPORAL;
 		String notes = "Test 123";
@@ -162,7 +188,6 @@ public class TestRankApi {
 		
 		mockMvc.perform(put("/ranks/{id}/role", player.getId().toString())
 					.contentType(APPLICATION_JSON_UTF8).content(requestJson))
-        	.andDo(MockMvcResultHandlers.print())
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
@@ -174,11 +199,10 @@ public class TestRankApi {
 	
 	@Test
 	public void testSetRankRoleNoDate () throws Exception {
-		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", LocalDate.of(2017, 3, 14)));
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
 		
 		Role newRole = Role.CORPORAL;
 		String notes = "Test 123";
-		LocalDate changeDate = LocalDate.now(Clock.systemUTC());
 		
 		Map<String, String> request = new HashMap<>();
 		request.put("role", newRole.name());
@@ -188,13 +212,12 @@ public class TestRankApi {
 		
 		mockMvc.perform(put("/ranks/{id}/role", player.getId().toString())
 					.contentType(APPLICATION_JSON_UTF8).content(requestJson))
-        	.andDo(MockMvcResultHandlers.print())
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
 			.andExpect(jsonPath("$.role", is(newRole.toString())))
 			.andExpect(jsonPath("$.roleHistory[0].role", is(newRole.toString())))
 			.andExpect(jsonPath("$.roleHistory[0].notes", is(notes)))
-			.andExpect(jsonPath("$.roleHistory[0].changeDate", is(changeDate.toString())));
+			.andExpect(jsonPath("$.roleHistory[0].changeDate", is(todayUtc.toString())));
 	}
 }

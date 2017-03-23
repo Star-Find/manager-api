@@ -5,10 +5,12 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Pattern;
 
 @Embeddable
 public final class NameChange {
 	@Column(nullable=false, length=12)
+	@Pattern(regexp="^[a-zA-Z0-9\\ \\-\\_]{1,12}$", message="Invalid display name (nameChange.name)")
 	private String name;
 	
 	@Column(nullable=false)
