@@ -12,6 +12,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'jacoco'
 
 bootRun {
 	systemProperties = System.properties
@@ -32,4 +33,18 @@ dependencies {
     runtime 'org.hibernate:hibernate-java8'
 	
     testCompile 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test { 
+    finalizedBy jacocoTestReport 
+}
+
+
+jacocoTestReport {
+    group = "Reporting"
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination "${buildDir}/reports/coverage"
+    }
 }
