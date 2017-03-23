@@ -22,7 +22,7 @@ public abstract class Player {
 	@GeneratedValue
 	protected UUID id;
 	
-	@Column(nullable=false, length=12)
+	@Column(nullable=false, length=12, unique=true)
 	protected String name;
 	
 	@ElementCollection(targetClass=NameChange.class)
