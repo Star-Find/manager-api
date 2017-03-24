@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -69,6 +70,7 @@ public class TestRankApi {
 	}
 
 	@Test
+	@WithMockUser(roles="admin")
 	public void testGetRank () throws Exception {
 		LocalDate added = LocalDate.of(2017, 3, 19); 
 		String name = "Test";
@@ -85,6 +87,7 @@ public class TestRankApi {
 	}
 
 	@Test
+	@WithMockUser(roles="admin")
 	public void testGetSortedRanks () throws Exception {
 		RankedPlayer player1 = rankRepository.save(new RankedPlayer("Test 1", Role.CORPORAL, LocalDate.of(2017, 3, 19)));
 		RankedPlayer player2 = rankRepository.save(new RankedPlayer("Test 2", Role.ELDER, LocalDate.of(2017, 2, 21)));
@@ -103,6 +106,7 @@ public class TestRankApi {
 	}
 
 	@Test
+	@WithMockUser(roles="admin")
 	public void testAddRank () throws Exception {
 		LocalDate added = LocalDate.of(2017, 3, 19); 
 		String name = "Test";
@@ -128,6 +132,7 @@ public class TestRankApi {
 	}
 	
 	@Test
+	@WithMockUser(roles="admin")
 	public void testSetRankName () throws Exception {
 		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.LIEUTENANT, LocalDate.of(2017, 3, 14)));
 		
@@ -151,6 +156,7 @@ public class TestRankApi {
 	}
 	
 	@Test
+	@WithMockUser(roles="admin")
 	public void testSetRankNameNoDate () throws Exception {
 		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
 		
@@ -172,6 +178,7 @@ public class TestRankApi {
 	}
 	
 	@Test
+	@WithMockUser(roles="admin")
 	public void testSetRankRole () throws Exception {
 		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CUSTODIAN, LocalDate.of(2017, 3, 14)));
 		
@@ -198,6 +205,7 @@ public class TestRankApi {
 	}
 	
 	@Test
+	@WithMockUser(roles="admin")
 	public void testSetRankRoleNoDate () throws Exception {
 		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
 		

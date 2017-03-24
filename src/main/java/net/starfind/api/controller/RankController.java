@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,6 @@ public class RankController {
 	@Autowired
 	private RankRepository rankRepository;
 
-	//@Secured("ROLE_ANNONYMOUS")
 	@RequestMapping(method=RequestMethod.GET)
 	public Page<RankedPlayer> getRanks (Pageable pageable) {
 		return rankRepository.findAll(pageable);
@@ -36,13 +36,13 @@ public class RankController {
 		return rankRepository.findOne(id);
 	}
 
-	//@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(method=RequestMethod.POST)
 	public RankedPlayer addRank(@Valid @RequestBody(required=true) RankedPlayer member) {
 		return rankRepository.save(member);
 	}
 
-	//@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(path="{id}/name", method={RequestMethod.POST, RequestMethod.PUT})
 	public RankedPlayer updateName (
 			@PathVariable("id") UUID id, 
@@ -56,7 +56,7 @@ public class RankController {
 		return rankRepository.save(player);
 	}
 
-	//@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(path="{id}/role", method={RequestMethod.POST, RequestMethod.PUT})
 	public RankedPlayer updateRole (
 			@PathVariable("id") UUID id, 
