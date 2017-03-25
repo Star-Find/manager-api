@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.starfind.api.model.NameChange;
 import net.starfind.api.model.RankedPlayer;
-import net.starfind.api.model.RoleChange;
 import net.starfind.api.repository.RankRepository;
+import net.starfind.api.request.NameChangeRequest;
+import net.starfind.api.request.RoleChangeRequest;
 
 @RestController
 @RequestMapping(path="/ranks/", produces="application/json")
@@ -46,12 +46,12 @@ public class RankController {
 	@RequestMapping(path="{id}/name", method={RequestMethod.POST, RequestMethod.PUT})
 	public RankedPlayer updateName (
 			@PathVariable("id") UUID id, 
-			@Valid @RequestBody(required=true) NameChange nameChange) {
+			@Valid @RequestBody(required=true) NameChangeRequest request) {
 		RankedPlayer player = rankRepository.findOne(id);
-		if (nameChange.getChangeDate() == null) {
-			player.updateName(nameChange.getName());			
+		if (request.getChangeDate() == null) {
+			player.updateName(request.getName());			
 		} else {
-			player.updateName(nameChange.getName(), nameChange.getChangeDate());			
+			player.updateName(request.getName(), request.getChangeDate());			
 		}
 		return rankRepository.save(player);
 	}
@@ -60,12 +60,12 @@ public class RankController {
 	@RequestMapping(path="{id}/role", method={RequestMethod.POST, RequestMethod.PUT})
 	public RankedPlayer updateRole (
 			@PathVariable("id") UUID id, 
-			@Valid @RequestBody(required=true) RoleChange roleChange) {
+			@Valid @RequestBody(required=true) RoleChangeRequest request) {
 		RankedPlayer player = rankRepository.findOne(id);
-		if (roleChange.getChangeDate() == null) {
-			player.updateRole(roleChange.getRole(), roleChange.getNotes());
+		if (request.getChangeDate() == null) {
+			player.updateRole(request.getRole(), request.getNotes());
 		} else {
-			player.updateRole(roleChange.getRole(), roleChange.getNotes(), roleChange.getChangeDate());
+			player.updateRole(request.getRole(), request.getNotes(), request.getChangeDate());
 		}
 		return rankRepository.save(player);
 	}
