@@ -3,6 +3,7 @@ package net.starfind.api;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 
 import java.nio.charset.Charset;
 import java.time.Clock;
@@ -61,7 +62,7 @@ public class TestRankApi {
 
 	@Before
 	public void setup() {
-		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
 	}
 	
 	@After
@@ -119,11 +120,8 @@ public class TestRankApi {
 		
 		String requestJson = JSON_MAPPER.writeValueAsString(request);
 		
-		System.out.println(requestJson);
-		
 		mockMvc.perform(post("/ranks/")
 				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
-    		.andDo(MockMvcResultHandlers.print())
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.name", is(name)))
@@ -233,5 +231,37 @@ public class TestRankApi {
 			.andExpect(jsonPath("$.roleHistory[0].previousRole", is(oldRole.toString())))
 			.andExpect(jsonPath("$.roleHistory[0].notes", is(notes)))
 			.andExpect(jsonPath("$.roleHistory[0].changeDate", is(todayUtc.toString())));
+	}
+	
+	@Test
+	@WithMockUser(roles="rank")
+	public void testSetRankRoleWrongPermission () throws Exception {
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("role", Role.ADMINISTRATOR.toString());
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(put("/ranks/{id}/role", player.getId().toString())
+				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(status().isForbidden());
+	}
+	
+	@Test
+	@WithMockUser(roles="rank")
+	public void testSetRankNameWrongPermission () throws Exception {
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("name", "Test 2");
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(put("/ranks/{id}/name", player.getId().toString())
+				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+		.andDo(MockMvcResultHandlers.print())
+			.andExpect(status().isForbidden());
 	}
 }
