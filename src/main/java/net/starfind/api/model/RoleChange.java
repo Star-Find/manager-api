@@ -1,7 +1,6 @@
 package net.starfind.api.model;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -12,9 +11,10 @@ public final class RoleChange {
 
 	@Column(nullable=false)
 	@NotNull
-	private Role role;
+	private Role previousRole;
 
 	@Column(nullable=false)
+	@NotNull
 	private LocalDate changeDate;
 	
 	private String notes;
@@ -23,14 +23,14 @@ public final class RoleChange {
 		
 	}
 	
-	public RoleChange (Role role, LocalDate changeDate, String notes) {
-		this.role = Objects.requireNonNull(role);
-		this.changeDate = Objects.requireNonNull(changeDate);
+	public RoleChange (Role previousRole, LocalDate changeDate, String notes) {
+		this.previousRole = previousRole;
+		this.changeDate = changeDate;
 		this.notes = notes;
 	}
 
-	public Role getRole() {
-		return role;
+	public Role getPreviousRole() {
+		return previousRole;
 	}
 
 	public LocalDate getChangeDate() {

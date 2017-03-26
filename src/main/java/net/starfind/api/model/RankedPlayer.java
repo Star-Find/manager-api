@@ -63,7 +63,7 @@ public class RankedPlayer extends Player {
 
 	public void updateRole (Role role, String notes, LocalDate changeDate) {
 		if (role != null && !role.equals(this.role)) {
-			roleHistory.add(new RoleChange(role, changeDate, notes));
+			roleHistory.add(new RoleChange(this.role, changeDate, notes));
 			this.role = role;
 		}
 	}

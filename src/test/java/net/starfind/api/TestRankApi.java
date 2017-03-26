@@ -134,7 +134,8 @@ public class TestRankApi {
 	@Test
 	@WithMockUser(roles="admin")
 	public void testSetRankName () throws Exception {
-		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.LIEUTENANT, LocalDate.of(2017, 3, 14)));
+		String oldName = "Test 1";
+		RankedPlayer player = rankRepository.save(new RankedPlayer(oldName, Role.LIEUTENANT, LocalDate.of(2017, 3, 14)));
 		
 		String newName = "New Name";
 		LocalDate changeDate = LocalDate.of(2017, 3, 19);
@@ -151,14 +152,15 @@ public class TestRankApi {
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
 			.andExpect(jsonPath("$.name", is(newName)))
-			.andExpect(jsonPath("$.nameHistory[0].name", is(newName)))
+			.andExpect(jsonPath("$.nameHistory[0].previousName", is(oldName)))
 			.andExpect(jsonPath("$.nameHistory[0].changeDate", is(changeDate.toString())));
 	}
 	
 	@Test
 	@WithMockUser(roles="admin")
 	public void testSetRankNameNoDate () throws Exception {
-		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
+		String oldName = "Test 1";
+		RankedPlayer player = rankRepository.save(new RankedPlayer(oldName, Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
 		
 		String newName = "New Name";
 		
@@ -173,14 +175,16 @@ public class TestRankApi {
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
 			.andExpect(jsonPath("$.name", is(newName)))
-			.andExpect(jsonPath("$.nameHistory[0].name", is(newName)))
+			.andExpect(jsonPath("$.nameHistory[0].previousName", is(oldName)))
 			.andExpect(jsonPath("$.nameHistory[0].changeDate", is(todayUtc.toString())));
 	}
 	
 	@Test
 	@WithMockUser(roles="admin")
 	public void testSetRankRole () throws Exception {
-		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CUSTODIAN, LocalDate.of(2017, 3, 14)));
+		Role oldRole = Role.CUSTODIAN;
+		
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", oldRole, LocalDate.of(2017, 3, 14)));
 		
 		Role newRole = Role.CORPORAL;
 		String notes = "Test 123";
@@ -199,7 +203,7 @@ public class TestRankApi {
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
 			.andExpect(jsonPath("$.role", is(newRole.toString())))
-			.andExpect(jsonPath("$.roleHistory[0].role", is(newRole.toString())))
+			.andExpect(jsonPath("$.roleHistory[0].previousRole", is(oldRole.toString())))
 			.andExpect(jsonPath("$.roleHistory[0].notes", is(notes)))
 			.andExpect(jsonPath("$.roleHistory[0].changeDate", is(changeDate.toString())));
 	}
@@ -207,7 +211,9 @@ public class TestRankApi {
 	@Test
 	@WithMockUser(roles="admin")
 	public void testSetRankRoleNoDate () throws Exception {
-		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
+		Role oldRole = Role.CAPTAIN;
+		
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", oldRole, LocalDate.of(2017, 3, 14)));
 		
 		Role newRole = Role.CORPORAL;
 		String notes = "Test 123";
@@ -224,7 +230,7 @@ public class TestRankApi {
 			.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 			.andExpect(jsonPath("$.id", is(player.getId().toString())))
 			.andExpect(jsonPath("$.role", is(newRole.toString())))
-			.andExpect(jsonPath("$.roleHistory[0].role", is(newRole.toString())))
+			.andExpect(jsonPath("$.roleHistory[0].previousRole", is(oldRole.toString())))
 			.andExpect(jsonPath("$.roleHistory[0].notes", is(notes)))
 			.andExpect(jsonPath("$.roleHistory[0].changeDate", is(todayUtc.toString())));
 	}

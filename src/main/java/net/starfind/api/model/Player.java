@@ -57,7 +57,7 @@ public abstract class Player {
 	
 	public void updateName (String name, LocalDate changeDate) {
 		if (name != null && !name.equalsIgnoreCase(this.name)) {
-			nameHistory.add(new NameChange(name, changeDate));
+			nameHistory.add(new NameChange(this.name, changeDate));
 			this.name = name;
 		}
 	}
