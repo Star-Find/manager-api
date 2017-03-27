@@ -24,7 +24,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -235,6 +234,25 @@ public class TestRankApi {
 	
 	@Test
 	@WithMockUser(roles="rank")
+	public void testAddRankWrongPermission () throws Exception {
+		LocalDate added = LocalDate.of(2017, 3, 19); 
+		String name = "Test";
+		Role role = Role.ADMINISTRATOR;
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("name", name);
+		request.put("role", role.toString());
+		request.put("addedDate", added.toString());
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(post("/ranks/")
+				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+				.andExpect(status().isForbidden());
+	}
+	
+	@Test
+	@WithMockUser(roles="rank")
 	public void testSetRankRoleWrongPermission () throws Exception {
 		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
 		
@@ -245,7 +263,6 @@ public class TestRankApi {
 		
 		mockMvc.perform(put("/ranks/{id}/role", player.getId().toString())
 				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
-			.andDo(MockMvcResultHandlers.print())
 			.andExpect(status().isForbidden());
 	}
 	
@@ -261,7 +278,52 @@ public class TestRankApi {
 		
 		mockMvc.perform(put("/ranks/{id}/name", player.getId().toString())
 				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
-		.andDo(MockMvcResultHandlers.print())
 			.andExpect(status().isForbidden());
+	}
+	
+	@Test
+	public void testAddRankNoUser () throws Exception {
+		LocalDate added = LocalDate.of(2017, 3, 19); 
+		String name = "Test";
+		Role role = Role.ADMINISTRATOR;
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("name", name);
+		request.put("role", role.toString());
+		request.put("addedDate", added.toString());
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(post("/ranks/")
+				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+				.andExpect(status().isUnauthorized());
+	}
+	
+	@Test
+	public void testSetRankRoleNoUser () throws Exception {
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("role", Role.ADMINISTRATOR.toString());
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(put("/ranks/{id}/role", player.getId().toString())
+				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+			.andExpect(status().isUnauthorized());
+	}
+	
+	@Test
+	public void testSetRankNameNoUser () throws Exception {
+		RankedPlayer player = rankRepository.save(new RankedPlayer("Test 1", Role.CAPTAIN, LocalDate.of(2017, 3, 14)));
+		
+		Map<String, String> request = new HashMap<>();
+		request.put("name", "Test 2");
+		
+		String requestJson = JSON_MAPPER.writeValueAsString(request);
+		
+		mockMvc.perform(put("/ranks/{id}/name", player.getId().toString())
+				.contentType(APPLICATION_JSON_UTF8).content(requestJson))
+			.andExpect(status().isUnauthorized());
 	}
 }
